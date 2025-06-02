@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=instagram_db'
+      - 'MYSQL_PASSWORD=123456'
+      - 'MYSQL_ROOT_PASSWORD=123456'
+      - 'MYSQL_USER=dev'
+    ports:
+      - '3307:3306' # full-projection follow host:container standard
+    volumes:
+      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # save data outside container, it helps save data even while you stop, delete and rebuild container
+      # docker will create a volume name mysql_data in host, attach that volume inside container at /var/lib/mysql
+      # all mysql data will be saved on mysql_data (real device)
+    networks: # connect container into an internet name "app-network"
+      - app-network
+networks: # define internet "app-network", use "bridge" type (internal virtual network)
+  app-network:
+    driver: bridge
+    # bridge is an internal virtual network, created by docker on host
+    # containers that contains in the same bridge network can call each other by service name.
+
+# run this command to create image in docker (cmd): docker-compose up -d
+# check mysql is running by connect through mysql workbench: docker exec -it <container_name> mysql -uroot -prootpassword -e "SHOW DATABASES;"
+
+
